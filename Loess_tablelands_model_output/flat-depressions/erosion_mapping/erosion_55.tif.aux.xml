@@ -1,0 +1,12 @@
+<PAMDataset>
+  <PAMRasterBand band="1">
+    <Description>154.0erosion_Brady</Description>
+    <Metadata>
+      <MDI key="STATISTICS_MAXIMUM">21.086351394653</MDI>
+      <MDI key="STATISTICS_MEAN">0.39806268440639</MDI>
+      <MDI key="STATISTICS_MINIMUM">-2.2266185283661</MDI>
+      <MDI key="STATISTICS_STDDEV">0.74421379019547</MDI>
+      <MDI key="STATISTICS_VALID_PERCENT">100</MDI>
+    </Metadata>
+  </PAMRasterBand>
+</PAMDataset>
