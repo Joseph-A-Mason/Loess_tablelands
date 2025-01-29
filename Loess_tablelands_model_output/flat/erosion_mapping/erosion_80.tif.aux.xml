@@ -1,0 +1,12 @@
+<PAMDataset>
+  <PAMRasterBand band="1">
+    <Description>179.0erosion_Bignell</Description>
+    <Metadata>
+      <MDI key="STATISTICS_MAXIMUM">10.183678627014</MDI>
+      <MDI key="STATISTICS_MEAN">1.2474513581906</MDI>
+      <MDI key="STATISTICS_MINIMUM">-0.23157927393913</MDI>
+      <MDI key="STATISTICS_STDDEV">0.77923270829642</MDI>
+      <MDI key="STATISTICS_VALID_PERCENT">100</MDI>
+    </Metadata>
+  </PAMRasterBand>
+</PAMDataset>

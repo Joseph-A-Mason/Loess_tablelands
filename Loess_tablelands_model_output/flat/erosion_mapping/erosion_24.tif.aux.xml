@@ -1,0 +1,12 @@
+<PAMDataset>
+  <PAMRasterBand band="1">
+    <Description>123.0erosion_Peoria</Description>
+    <Metadata>
+      <MDI key="STATISTICS_MAXIMUM">6.7425146102905</MDI>
+      <MDI key="STATISTICS_MEAN">0.76091093831757</MDI>
+      <MDI key="STATISTICS_MINIMUM">-7.042308425298e-08</MDI>
+      <MDI key="STATISTICS_STDDEV">1.0092717927498</MDI>
+      <MDI key="STATISTICS_VALID_PERCENT">100</MDI>
+    </Metadata>
+  </PAMRasterBand>
+</PAMDataset>
