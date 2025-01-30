@@ -14,15 +14,25 @@ __wbt.shp: Flowpaths with > 1000 cell drainage area, produced using BreachDepres
 List of tablelands analyzed:
 
 Ash_Hollow_W: Bedrock tableland west of Ogallala, Nebraska, part of the Cheyenne Tableland
+
 bartek: Loess tableland, part of West Table (labeled as such on maps), between Merna and Arnold, Nebraska
+
 Bignell_Hill: Loess tableland south of Bignell, Nebraska
+
 e_table_clp2: Loess tableland, East Table (labeled as such on maps), northeast of Broken Bow, Nebraska
+
 enders_2m: Loess tableland, south of Enders Reservoir on Frenchman Creek, Nebraska
+
 Imperial_NE: Bedrock tableland, northeast of Imperial, Nebraska
+
 og_surf_W: Bedrock tableland west of Ogallala, Nebraska, part of the Cheyenne Tableland
+
 og_surf_area_2m: Bedrock tableland west of Ogallala, Nebraska, part of the Cheyenne Tableland
+
 sm_table1_clp2: Loess tableland, Boggs Table (labeled as such on maps), NE of Broken Bow, western Nebraska
+
 tallinn: Loess tableland, Tallinn Table (labeled as such on maps), between Arnold and Gothenburg, Nebraska
+
 wauneta1: Loess tableland, northwest of Wauneta, Nebraska, between Frenchman and Spring creeks
 
 The R script "Drainage_Net_Analysis.R" was used to produce these maps, with parameters set as in the copy of that script in the directory Tabelelands_R_Scripts
