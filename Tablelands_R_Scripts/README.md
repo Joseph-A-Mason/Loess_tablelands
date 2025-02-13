@@ -17,4 +17,4 @@ All scripts have been run successfully in R 4.2.2
 
 **slope_analysis_new_2.R** uses DEMs output every 250 model years by the landscape evolution model, DEMs for individual output DEMs, or individual DEMs of real landscapes to produce slope maps. Also analyzes slopes by 10 m elevations slice but these results are not used in this paper. Used for Figure 9.
 
-^^strength_plots.R** is used to plot strength measurements and perform statistical tests on them. Used for Figure 5.
+**strength_plots.R** is used to plot strength measurements and perform statistical tests on them. Used for Figure 5.
