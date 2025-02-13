@@ -1,4 +1,5 @@
-#Script to calculate and erosion rate and cumulative erosion from model
+#Script to calculate  and plot erosion rate, cumulative erosion from model
+#including domain mean and point values
 #output dems. Versions for model domain mean and point values.
 #Fill in "" with directory and file paths as needed
 

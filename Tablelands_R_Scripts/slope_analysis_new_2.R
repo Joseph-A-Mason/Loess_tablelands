@@ -1,3 +1,5 @@
+#script for multiple types of slope mapping and plotting by elevation bands
+
 library(terra)
 library(sf)
 library(RColorBrewer)
@@ -6,7 +8,7 @@ library(qgisprocess)
 
 #version for multiple ESRI ascii DEMs in a folder
 
-setwd("D:/Dropbox/aeolian_landscapes/eguModels/One-sided_lowKmidLA/og_surf6")
+setwd("")
 
 #create list of output dems
 list_asc <- list.files(pattern='.elevation.', full=TRUE)
