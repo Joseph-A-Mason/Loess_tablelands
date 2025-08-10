@@ -1,5 +1,4 @@
-#Script to calculate  and plot erosion rate, cumulative erosion from model
-#including domain mean and point values
+#Script to calculate and erosion rate and cumulative erosion from model
 #output dems. Versions for model domain mean and point values.
 #Fill in "" with directory and file paths as needed
 
@@ -9,97 +8,97 @@ library(ggplot2)
 library(qgisprocess)
 
 #Scenarios (change names as needed)
-scenario1 <- "Bedrock-depressions"
-scenario2 <- "Bedrock-drain"
+scenario1 <- "Og_surf4"
+scenario2 <- "Og_surf6"
 scenario3 <- "Flat"
 scenario4 <- "Flat3dep"
 
 #Model setup
-total_t <- 26000
-loess1 <- c(0.0025, 10800)
-loess1b <- c(0.00225, 12000)
-loess2 <- c(0.00025, 15000)
-loess2b <- c(0.00035, 16000)
-loess3 <- c(0.0006, 26000)
-dimensions <- c(626, 626)
-cell_size<-100
-num_cells <- dimensions[1]*dimensions[2]
+total_t = 26000
+loess1 = c(0.0025, 10800)
+loess1b = c(0.00225, 12000)
+loess2 = c(0.00025, 15000)
+loess2b = c(0.00035, 16000)
+loess3 = c(0.0006, 26000)
+dimensions = c(626, 626)
+cell_size=100
+num_cells = dimensions[1]*dimensions[2]
 
-#initial surfaces. Replace ... with the rest of the path
-init_dem1<-rast('.../100.0elevation_Peoria.txt')
-init_dem2<-rast('.../100.0elevation_Peoria.txt')
-init_dem3<-rast('.../100.0elevation_Peoria.txt')
-init_dem4<-rast('.../100.0elevation_Peoria.txt')
+#initial surfaces
+init_dem1<-rast('')
+init_dem2<-rast('')
+init_dem3<-rast('')
+init_dem4<-rast('')
 
 erosion_analysis <- function(scenario, init_dem, total_t, loess1, loess2, loess3, 
                              cell_size, num_cells){
   #create list of output erosion maps
   list_asc <- list.files(pattern='.erosion.', full=TRUE)
-  num_steps<-length(list_asc)-1
+  num_steps=length(list_asc)-1
   
   #create list of output elevation maps
   list_asc2 <- list.files(pattern='.elevation.', full=TRUE)
-  num_steps<-length(list_asc2)-1
+  num_steps=length(list_asc2)-1
   
-  time_per_step<-total_t/num_steps
+  time_per_step=total_t/num_steps
   
   erosion<-matrix(nrow=num_steps, ncol=14)
   erosion[,1]<-scenario
-  loess_total <- 0.0
-  prev_loess_dep <- loess1[1]*time_per_step
-  prev_erosion <- rast(list_asc[1])
+  loess_total = 0.0
+  prev_loess_dep = loess1[1]*time_per_step
+  prev_erosion = rast(list_asc[1])
   
   for (i in 2:(num_steps+1)) {
-    years <- (i-1)*time_per_step
-    erosion[(i-1), 2] <- years
+    years = (i-1)*time_per_step
+    erosion[(i-1), 2] = years
     if (years <= loess1[2]) {
-      loess_dep <- loess1[1]*time_per_step
+      loess_dep = loess1[1]*time_per_step
     } else if (years <= loess1b[2]) {
-      loess_dep <- (loess1[1]-((loess1b[1]/(loess1b[2]-loess1[2]))*(years-loess1[2])))*time_per_step
+      loess_dep = (loess1[1]-((loess1b[1]/(loess1b[2]-loess1[2]))*(years-loess1[2])))*time_per_step
     } else if (years <= loess2[2]) {
-      loess_dep <- loess2[1]*time_per_step
+      loess_dep = loess2[1]*time_per_step
     } else if (years <= loess2b[2]) {
-      loess_dep <- (loess2[1]+((loess2b[1]/(loess2b[2]-loess2[2]))*(years-loess2[2])))*time_per_step
+      loess_dep = (loess2[1]+((loess2b[1]/(loess2b[2]-loess2[2]))*(years-loess2[2])))*time_per_step
     } else {
-      loess_dep <- loess3[1]*time_per_step
+      loess_dep = loess3[1]*time_per_step
     }
-    loess_total <- loess_total + loess_dep
-    erosion[(i-1), 3] <- loess_total
-    localrast <- rast(list_asc[i])
-    total_erosion_rast <- localrast+prev_erosion
-    total_erosion_mean <- global(total_erosion_rast, fun="mean")
-    total_erosion_min <- global(total_erosion_rast, fun="min")
-    total_erosion_max <- global(total_erosion_rast, fun="max")
-    erosion[(i-1), 4] <- total_erosion_mean$mean
-    erosion[(i-1), 5] <- total_erosion_min$min
-    erosion[(i-1), 6] <- total_erosion_max$max
-    loess_eroded <- total_erosion_rast/loess_total
-    loess_eroded_mean <- global(loess_eroded, fun="mean")
-    loess_eroded_min <- global(loess_eroded, fun="min")
-    loess_eroded_max <- global(loess_eroded, fun="max")
-    erosion[(i-1), 7] <- loess_eroded_mean$mean
-    erosion[(i-1), 8] <- loess_eroded_min$min
-    erosion[(i-1), 9] <- loess_eroded_max$max
-    erosion_rate_rast <- localrast*4
-    tifname1<-paste0("./erosion_mapping/erosion_", i, ".tif")
-    writeRaster(erosion_rate_rast, 
-                tifname1, 
-                overwrite=TRUE)
-    elevation_rast <- rast(list_asc2[i])
-    tifname2<-paste0("./erosion_mapping/elevation_", i, ".tif")
-    writeRaster(elevation_rast, 
-                tifname2, 
-                overwrite=TRUE)
-    erosion_rate_mean <- global(erosion_rate_rast, fun="mean")
-    erosion_rate_min <- global(erosion_rate_rast, fun="min")
-    erosion_rate_max <- global(erosion_rate_rast, fun="max")
-    erosion[(i-1), 10] <- erosion_rate_mean$mean
-    erosion[(i-1), 11] <- erosion_rate_min$min
-    erosion[(i-1), 12] <- erosion_rate_max$max
-    erosion[(i-1), 13] <- erosion_rate_mean$mean/1000
-    erosion[(i-1), 14] <- (erosion_rate_mean$mean*num_cells*cell_size)/1000
-    prev_erosion <- total_erosion_rast
-    prev_loess_dep <- loess_dep
+    loess_total = loess_total + loess_dep
+    erosion[(i-1), 3] = loess_total
+    localrast = rast(list_asc[i])
+    total_erosion_rast = localrast+prev_erosion
+    total_erosion_mean = global(total_erosion_rast, fun="mean")
+    total_erosion_min = global(total_erosion_rast, fun="min")
+    total_erosion_max = global(total_erosion_rast, fun="max")
+    erosion[(i-1), 4] = total_erosion_mean$mean
+    erosion[(i-1), 5] = total_erosion_min$min
+    erosion[(i-1), 6] = total_erosion_max$max
+    loess_eroded = total_erosion_rast/loess_total
+    loess_eroded_mean = global(loess_eroded, fun="mean")
+    loess_eroded_min = global(loess_eroded, fun="min")
+    loess_eroded_max = global(loess_eroded, fun="max")
+    erosion[(i-1), 7] = loess_eroded_mean$mean
+    erosion[(i-1), 8] = loess_eroded_min$min
+    erosion[(i-1), 9] = loess_eroded_max$max
+    erosion_rate_rast = localrast*4
+    # tifname1<-paste0("./erosion_mapping/erosion_", i, ".tif")
+    # writeRaster(erosion_rate_rast, 
+    #             tifname1, 
+    #             overwrite=TRUE)
+    elevation_rast = rast(list_asc2[i])
+    # tifname2<-paste0("./erosion_mapping/elevation_", i, ".tif")
+    # writeRaster(elevation_rast, 
+    #             tifname2, 
+    #             overwrite=TRUE)
+    erosion_rate_mean = global(erosion_rate_rast, fun="mean")
+    erosion_rate_min = global(erosion_rate_rast, fun="min")
+    erosion_rate_max = global(erosion_rate_rast, fun="max")
+    erosion[(i-1), 10] = erosion_rate_mean$mean
+    erosion[(i-1), 11] = erosion_rate_min$min
+    erosion[(i-1), 12] = erosion_rate_max$max
+    erosion[(i-1), 13] = erosion_rate_mean$mean/1000
+    erosion[(i-1), 14] = (erosion_rate_mean$mean*num_cells*cell_size)/1000
+    prev_erosion = total_erosion_rast
+    prev_loess_dep = loess_dep
   }
   erosion_df<-as.data.frame(erosion)
   colnames(erosion_df)<-c('Scenario','Years','Loess_Deposited',
@@ -133,10 +132,11 @@ erosion_df_all<-rbind(erosion_df1, erosion_df2, erosion_df3, erosion_df4)
 cols <- names(erosion_df_all)[2:14]
 erosion_df_all[cols] <- lapply(erosion_df_all[cols], as.numeric)
 
-ScenarioNames <- c("Flat", "Flat-Depressions","Bedrock-Depressions", "Bedrock-Drain")
+write.csv(erosion_df_all, "")
+erosion_df_all<-read.csv("",
+                         header=TRUE)
 
-ggplot(erosion_df_all, aes(Years, Total_Erosion_Mean, colour = Scenario)) + 
-  geom_line()
+ScenarioNames <- c("Flat", "Flat-Depressions","Bedrock-Depressions", "Bedrock-Drain")
 
 ggplot(erosion_df_all, aes(Years, Total_Erosion_Mean, colour=Scenario)) +
   geom_line(linewidth=1.2)+
@@ -144,7 +144,9 @@ ggplot(erosion_df_all, aes(Years, Total_Erosion_Mean, colour=Scenario)) +
   scale_colour_brewer(name="Scenario", palette='Paired', 
                       labels=ScenarioNames[1:4])+
   #scale_x_continuous(limits=c(0, 26000))+
-  labs(x="Years", y="Mean Cumulative Erosion (m)")+
+  scale_y_continuous(limits=c(0, 40))+
+  labs(title= "K=0.0012, D=0.05, SPcrit=0.001, No Brady Soil Interval",
+       x="Years", y="Mean Cumulative Erosion (m)")+
   theme(aspect.ratio = 1,
         panel.background=element_rect(fill="white", colour="black"),
         panel.grid.major=element_line(colour="gray"),
@@ -152,9 +154,9 @@ ggplot(erosion_df_all, aes(Years, Total_Erosion_Mean, colour=Scenario)) +
         axis.title.y = element_text(size = rel(1.3), angle = 90),
         axis.title.x = element_text(size = rel(1.3)),
         axis.text = element_text(size = rel(1.3)),
-        legend.position=c(0.34, 0.8),
+        legend.position.inside=c(0.34, 0.8),
         legend.key.width=unit(1,"cm"),
-        legend.key =element_rect(fill="transparent"),
+        legend.key =element_rect(fill="transparent", linetype=0),
         legend.text = element_text(size = rel(1.1)),
         legend.title = element_text(size = rel(1.1))
   )
@@ -165,7 +167,8 @@ ggplot(erosion_df_all, aes(Years, Mean_Erosion_Per_Year, colour=Scenario)) +
   scale_colour_brewer(name="Scenario", palette='Paired', 
                       labels=ScenarioNames[1:4])+
   #scale_x_continuous(limits=c(0, 26000))+
-  labs(x="Years", y="Mean Erosion Per Year (m)")+
+  labs(title= "K=0.0004, D=0.05, SPcrit=0.001",
+       x="Years", y="Mean Erosion Per Year (m)")+
   theme(aspect.ratio = 1,
         panel.background=element_rect(fill="white", colour="black"),
         panel.grid.major=element_line(colour="gray"),
@@ -173,9 +176,9 @@ ggplot(erosion_df_all, aes(Years, Mean_Erosion_Per_Year, colour=Scenario)) +
         axis.title.y = element_text(size = rel(1.3), angle = 90),
         axis.title.x = element_text(size = rel(1.3)),
         axis.text = element_text(size = rel(1.3)),
-        legend.position=c(1.35, 0.5),
+        legend.position.inside=c(1.35, 0.5),
         legend.key.width=unit(1,"cm"),
-        legend.key =element_rect(fill="transparent"),
+        legend.key =element_rect(fill="transparent", linetype=0),
         legend.text = element_text(size = rel(1.1)),
         legend.title = element_text(size = rel(1.1))
   )
@@ -186,7 +189,8 @@ ggplot(erosion_df_all, aes(Years, Mean_Erosion_Per_Year*1400000, colour=Scenario
   scale_colour_brewer(name="Scenario", palette='Paired', 
                       labels=ScenarioNames[1:4])+
   #scale_x_continuous(limits=c(0, 26000))+
-  labs(x="Years", y="Sediment Yield Per Year (tonne/km2)")+
+  labs(title= "K=0.0012, D=0.05, SPcrit=0.001, No Brady Soil Interval",
+       x="Years", y="Sediment Yield Per Year (tonne/km2)")+
   theme(aspect.ratio = 1,
         panel.background=element_rect(fill="white", colour="black"),
         panel.grid.major=element_line(colour="gray"),
@@ -194,9 +198,9 @@ ggplot(erosion_df_all, aes(Years, Mean_Erosion_Per_Year*1400000, colour=Scenario
         axis.title.y = element_text(size = rel(1.3), angle = 90),
         axis.title.x = element_text(size = rel(1.3)),
         axis.text = element_text(size = rel(1.3)),
-        legend.position=c(1.35, 0.5),
+        legend.position.inside=c(1.35, 0.5),
         legend.key.width=unit(1,"cm"),
-        legend.key =element_rect(fill="transparent"),
+        legend.key =element_rect(fill="transparent", linetype=0),
         legend.text = element_text(size = rel(1.1)),
         legend.title = element_text(size = rel(1.1))
   )
@@ -207,7 +211,9 @@ ggplot(erosion_df_all, aes(Years, Mean_Fract_Loess_Eroded, colour=Scenario)) +
   scale_colour_brewer(name="Scenario", palette='Paired', 
                       labels=ScenarioNames[1:4])+
   #scale_x_continuous(limits=c(0, 26000))+
-  labs(x="Years", y="Mean Fraction of Loess Eroded")+
+  labs(title= "K=0.0012, D=0.05, SPcrit=0.001, No Brady Soil Interval",
+       x="Years", y="Mean Fraction of Loess Eroded")+
+  scale_y_continuous(limits=c(0, 1.0))+
   theme(aspect.ratio = 1,
         panel.background=element_rect(fill="white", colour="black"),
         panel.grid.major=element_line(colour="gray"),
@@ -215,9 +221,9 @@ ggplot(erosion_df_all, aes(Years, Mean_Fract_Loess_Eroded, colour=Scenario)) +
         axis.title.y = element_text(size = rel(1.3), angle = 90),
         axis.title.x = element_text(size = rel(1.3)),
         axis.text = element_text(size = rel(1.3)),
-        legend.position=c(1.35, 0.5),
+        legend.position.inside=c(1.35, 0.5),
         legend.key.width=unit(1,"cm"),
-        legend.key =element_rect(fill="transparent"),
+        legend.key =element_rect(fill="transparent", linetype=0),
         legend.text = element_text(size = rel(1.1)),
         legend.title = element_text(size = rel(1.1))
   )
@@ -234,7 +240,7 @@ sample_points_v<-vect(sample_points)
 plot(r)
 plot(sample_points_v,add=TRUE)
 
-#export raster and shapefile if desired. Fill in file names in ""
+#export raster and shapefile if desired
 writeRaster(r, 
             "", 
             overwrite=TRUE)
@@ -247,48 +253,48 @@ erosion_analysis2 <- function(scenario, init_dem, total_t, loess1, loess1b,
   #create list of output dems (change "elevation" to "erosion" to get erosion maps)
   list_asc <- list.files(pattern='.elevation.', full=TRUE)
   #check if list is in correct order
-  num_steps<-length(list_asc)-1
-  time_per_step<-total_t/num_steps
+  num_steps=length(list_asc)-1
+  time_per_step=total_t/num_steps
   
   erosion2<-matrix(nrow=num_steps, ncol=19)
   erosion2[,1]<-scenario
-  prev_rast <- init_dem
-  loess_total <- 0.0
+  prev_rast = init_dem
+  loess_total = 0.0
   
   for (i in 2:(num_steps+1)) {
-    years <- (i-1)*time_per_step
-    erosion2[(i-1), 2] <- years
+    years = (i-1)*time_per_step
+    erosion2[(i-1), 2] = years
     if (years <= loess1[2]) {
-      loess_dep <- loess1[1]*time_per_step
+      loess_dep = loess1[1]*time_per_step
     } else if (years <= loess1b[2]) {
-      loess_dep <- (loess1[1]-((loess1b[1]/(loess1b[2]-loess1[2]))*(years-loess1[2])))*time_per_step
+      loess_dep = (loess1[1]-((loess1b[1]/(loess1b[2]-loess1[2]))*(years-loess1[2])))*time_per_step
     } else if (years <= loess2[2]) {
-      loess_dep <- loess2[1]*time_per_step
+      loess_dep = loess2[1]*time_per_step
     } else if (years <= loess2b[2]) {
-      loess_dep <- (loess2[1]+((loess2b[1]/(loess2b[2]-loess2[2]))*(years-loess2[2])))*time_per_step
+      loess_dep = (loess2[1]+((loess2b[1]/(loess2b[2]-loess2[2]))*(years-loess2[2])))*time_per_step
     } else {
-      loess_dep <- loess3[1]*time_per_step
+      loess_dep = loess3[1]*time_per_step
     }
-    loess_total <- loess_total + loess_dep
-    erosion2[(i-1), 3] <- loess_total
-    localrast <- rast(list_asc[i])
-    total_erosion_rast <- ((localrast - init_dem) - loess_total)*-1
-    loess_remaining <- loess_total - total_erosion_rast
-    loess_fract <- loess_remaining/loess_total
-    step_erosion_rast <- ((localrast - prev_rast) - loess_dep)*-1
-    extract1<-(extract(localrast, sample_points))
-    colnames(extract1)<-'value'
-    erosion2[(i-1), 4:7]<-extract1$value[1:4]
-    extract2<-(extract(total_erosion_rast, sample_points))
-    colnames(extract2)<-'value'
-    erosion2[(i-1), 8:11]<-extract2$value[1:4]
-    extract3<-(extract(loess_remaining, sample_points))
-    colnames(extract3)<-'value'
-    erosion2[(i-1), 12:15]<-extract3$value[1:4]
-    extract4<-(extract(loess_fract, sample_points))
-    colnames(extract4)<-'value'
-    erosion2[(i-1), 16:19]<-extract4$value[1:4]
-    prev_rast <- localrast
+    loess_total = loess_total + loess_dep
+    erosion2[(i-1), 3] = loess_total
+    localrast = rast(list_asc[i])
+    total_erosion_rast = ((localrast - init_dem) - loess_total)*-1
+    loess_remaining = loess_total - total_erosion_rast
+    loess_fract = loess_remaining/loess_total
+    step_erosion_rast = ((localrast - prev_rast) - loess_dep)*-1
+    extract1=(extract(localrast, sample_points))
+    colnames(extract1)='value'
+    erosion2[(i-1), 4:7]=extract1$value[1:4]
+    extract2=(extract(total_erosion_rast, sample_points))
+    colnames(extract2)='value'
+    erosion2[(i-1), 8:11]=extract2$value[1:4]
+    extract3=(extract(loess_remaining, sample_points))
+    colnames(extract3)='value'
+    erosion2[(i-1), 12:15]=extract3$value[1:4]
+    extract4=(extract(loess_fract, sample_points))
+    colnames(extract4)='value'
+    erosion2[(i-1), 16:19]=extract4$value[1:4]
+    prev_rast = localrast
   }
   
   
@@ -453,9 +459,9 @@ hillshade <- qgis_run_algorithm(
 
 hshd <- qgis_as_terra(qgis_extract_output(hillshade))
 
-erode_colors<-colorRampPalette(c('#2c7bb6','#abd9e9','#ffffbf','#fdae61','#d7191c'))
+erode_colors=colorRampPalette(c('#2c7bb6','#abd9e9','#ffffbf','#fdae61','#d7191c'))
 #set breaks
-cuts<-c(-10.0,-0.1,0.1,5.0,10.0, 20.0)
+cuts=c(-10.0,-0.1,0.1,5.0,10.0, 20.0)
 leg.txt <- c("<-0.1", "-0.1-0.1", "0.1-5.0", "5.0-10.0", '10.0-20.0')
 
 #png(filename)

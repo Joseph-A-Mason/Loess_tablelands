@@ -11,14 +11,15 @@ library(sf)
 library(rgrass)
 library(RColorBrewer)
 
-setwd("")
+setwd("C:/Users/mason/Dropbox/aeolian_landscapes/GIS_working")
 
 #Name of table
-TableName <- "tallinn"
+TableName <- "bartek_depr_fract2"
 tifname<-(paste0(TableName,".tif"))
 
 #import dem to terra
 dem <- rast(tifname)
+crs(dem)<- "epsg:32614"
 
 #Optional, configure and enable plugins and find algorithm needed
 # qgis_configure(use_cached_data = TRUE)
@@ -34,7 +35,16 @@ depr <- qgis_run_algorithm(
   range = 100.0
 )
 depr_r <- qgis_as_terra(qgis_extract_output(depr))
-depr_r <- subst(depr_r, 0, NA, others=NULL)
+plot(depr_r)
+
+#use if desired to get percent in depressions
+# depr_binary<-ifel(depr_r>0.5, 1, 0)
+# plot(depr_binary)
+# depression_cells<- sum(values(depr_binary) == 1, na.rm = TRUE)
+# total_cells<- sum(!is.na(values(depr_r)))
+# depression_cells/total_cells
+# 
+# depr_r <- subst(depr_r, 0, NA, others=NULL)
 
 #Map streams with GRASS GIS r.watershed tool
 r_watershed_strm <- qgis_run_algorithm(

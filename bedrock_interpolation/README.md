@@ -13,13 +13,5 @@ The shapefiles, and details of each, are:
 
 **Dankorth_TH_RW.shp**. For Ogallala W area. Created by joining two shapefiles representing registered wells and geologic test holes from the Conservation and Survey Division, UNL, after calculation of elevation at the top of bedrock from depth and surface elevation. Only a few directly relevant fields were included in the join: RASTERVALU: Surface elevation in meters, Depg_ft2= interpreted depth to top of Ogallala or Broadwater in feet for registered wells, DepthOg = top (not depth) of Ogallala or Broadwater in feet, TopOg2 = elevation in meters of the top of the Ogallala or Broadwater, TopOgI2 = rounded integer value, for plotting purposes only.
 
-This directory also contains the interpolated top of bedrock surfaces for each area, with surface elevation in meters. All have been clipped to remove areas where the interpolated bedrock surface elevation is above the modern land surface, mainly along dissected tableland margins.
-
-**Idw_Enders_w4_cl.tif** is the Enders Table area
-
-**Idw_wauneta1_cl.tif** is the Wauneta Table area
-
-**Idw_dankwort1_cl.tif** is the Ogallala W area
-
 
 
