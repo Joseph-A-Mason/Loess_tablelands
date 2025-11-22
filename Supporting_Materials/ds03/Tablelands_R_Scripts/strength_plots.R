@@ -2,7 +2,7 @@ library(ggplot2)
 library(cowplot)
 
 # Set working directory
-setwd("")
+setwd("____")
 
 #read input, subset as needed
 strength<-read.csv("Strength2.csv", header=TRUE, sep=',')
@@ -15,9 +15,13 @@ PP_strength
 #plots
 #change the number inside rel() to adjust font size
 #change legend.position numbers to move legend
+
+point_colors=c('#8c510a','#bf812d','#dfc27d','#c7eae5','#80cdc1','#35978f','#01665e')
+
 p1<-ggplot(TV_strength, aes(Fr_Water, Strength, colour=Unit, shape=Horizon)) +
-  geom_point(size = 4, show.legend=FALSE)+
-  scale_colour_brewer(palette='Dark2')+
+  geom_point(size = 5, show.legend=FALSE)+
+  #scale_colour_brewer(palette='YlGnBu')+
+  scale_colour_manual(values=point_colors)+
   scale_x_continuous(labels = scales::percent)+
   labs(x="Gravimetric Water Content", y=bquote("Shear Strength"~(kg~cm^2)))+
   theme(aspect.ratio = 0.7,
@@ -38,8 +42,9 @@ p1
 #change the number inside rel() to adjust font size
 #change legend.position numbers to move legend
 p2<-ggplot(PP_strength, aes(Fr_Water, Strength, colour=Unit, shape=Horizon)) +
-  geom_point(size = 4, show.legend=FALSE)+
-  scale_colour_brewer(palette='Dark2')+
+  geom_point(size = 5, show.legend=FALSE)+
+  #scale_colour_brewer(palette='Dark2')+
+  scale_colour_manual(values=point_colors)+
   scale_x_continuous(labels = scales::percent)+
   labs(x="Gravimetric Water Content", y=expression(paste("Unconf. Compr. Strength ",(kg~cm^-2))))+
   theme(aspect.ratio = 0.7,
@@ -63,9 +68,10 @@ TV_strength2$PP_Strength <-PP_strength$Strength
 TV_strength2
 
 p3<-ggplot(TV_strength2, aes(Strength, PP_Strength, colour=Unit, shape=Horizon)) +
-  geom_point(size = 4)+
+  geom_point(size = 5)+
   geom_segment(aes(x=0, y=0, xend=1.75, yend=3.5), colour="gray", linetype=1, linewidth=1)+
-  scale_colour_brewer(palette='Dark2')+
+  #scale_colour_brewer(palette='Dark2')+
+  scale_colour_manual(values=point_colors)+
   labs(x=expression(paste("Shear Strength ",(kg~cm^-2))), 
        y=expression(paste("Unconf. Compr. Strength ",(kg~cm^-2))))+
   theme(aspect.ratio = 0.7,
@@ -77,7 +83,7 @@ p3<-ggplot(TV_strength2, aes(Strength, PP_Strength, colour=Unit, shape=Horizon))
         axis.text = element_text(size = rel(1.2)),
         legend.position=c(1.7, 0.5),
         legend.key.width=unit(1,"cm"),
-        legend.key =element_rect(fill="transparent"),
+        legend.key =element_rect(fill="transparent", linetype=0),
         #legend.box.background = element_rect(color = 'black'),
         legend.box.margin = margin(t = 1, l = 1),
         legend.text = element_text(size = rel(1.2)),
@@ -90,10 +96,10 @@ aligned_plots <- align_plots(p1, p2, p3, align="hv")
 
 ggdraw() +
   draw_plot(aligned_plots[[1]], x = 0, y = 0.48, width = 0.45, height = 0.45) +
-  draw_plot(aligned_plots[[2]], x = 0.47, y = 0.48, width = 0.45, height = 0.45) +
-  draw_plot(aligned_plots[[3]], x = -0.09, y = 0.04, width = 0.65, height = 0.45) +
+  draw_plot(aligned_plots[[2]], x = 0.40, y = 0.48, width = 0.45, height = 0.45) +
+  draw_plot(aligned_plots[[3]], x = -0.1, y = 0.04, width = 0.65, height = 0.45) +
   draw_plot_label(label = c("a", "b", "c"), size = 15,
-                  x = c(0.082, 0.55, 0.082), y = c(0.96, 0.96, 0.525))  
+                  x = c(0.090, 0.49, 0.090), y = c(0.96, 0.96, 0.525))  
 
 #stats on data
 #correlation of PP and TV
